@@ -1,10 +1,17 @@
 package com.santana.sc.processor;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 
+import java.util.Date;
 
 import org.apache.hadoop.io.MapWritable;
 import org.apache.hadoop.io.Text;
@@ -18,6 +25,15 @@ import org.elasticsearch.hadoop.mr.EsInputFormat;
 
 
 import org.elasticsearch.hadoop.mr.WritableArrayWritable;
+import org.joda.time.DateTime;
+import org.joda.time.Hours;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
+import org.joda.time.Seconds;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
+import com.google.common.collect.Lists;
 
 import scala.Tuple2;
 
@@ -32,32 +48,36 @@ public class BusProcessing {
 		JobConf jc = new JobConf();    
 		jc.set("es.nodes","localhost");
 	    jc.set("es.port","9200");
-		jc.set("es.resource", "sptrans2/onibus");       
-		//jc.set("es.query", "?q=me*");                 
+		jc.set("es.resource", "sptrans3/onibus");  
+		
+		
 
-		JavaPairRDD<String, Map<String, Object>> esRDD = ctx.hadoopRDD(jc, EsInputFormat.class,
-		                                        Position.class, MapWritable.class); 
-		//esRDD.collect();
-		//JavaRDD<String> words = lines.flatMap(s -> Arrays.asList(s));
+		JavaPairRDD<String, Map<String, Object>> esRDD = ctx.hadoopRDD(jc, EsInputFormat.class, Object.class, MapWritable.class); 
 		JavaPairRDD<String, Position> counts = esRDD
 				.mapToPair(w -> {
 					WritableArrayWritable address =(WritableArrayWritable) w._2.get(new Text("location"));
 	                Text lat = (Text) address.get()[0];
-	                Text lon = (Text) address.get()[0];
+	                Text lon = (Text) address.get()[1];
+	               
+	                String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+	                DateTimeFormatter dtf = DateTimeFormat.forPattern(pattern);
+	                DateTime dateTime = dtf.parseDateTime(w._2().get(new Text("dateBus")).toString());
+	                Date date = dateTime.toDate();					
 					
-					
-					return new Tuple2<String, Position>(w._2().get(new Text("name")).toString(),
+					return new Tuple2<String, Position>(w._2().get(new Text("busCode")).toString(),
 							new Position(Float.parseFloat(lat.toString()), Float
-									.parseFloat(lon.toString()), null));
+									.parseFloat(lon.toString()), date));
 				});
 
 		JavaPairRDD<String, Iterable<Position>> grades = counts.groupByKey();
-
+		
 		for (Tuple2<String, Iterable<Position>> tuple : grades.collect()) {
 			Iterable<Position> list = tuple._2();
 			Position lastPosition = null;
 			System.out.println(tuple._1());
-			for (Position p : list) {
+			ArrayList<Position> pos = Lists.newArrayList(list);
+			Collections.sort(pos);
+			for (Position p : pos) {
 				if (lastPosition == null) {
 					lastPosition = p;
 				} else {
@@ -67,8 +87,13 @@ public class BusProcessing {
 							p.getLongitude(), 'K');
 					
 					
+					LocalDateTime dateLast = new LocalDateTime(lastPosition.getDate());
+					LocalDateTime date = new LocalDateTime(p.getDate());
+					
+					Seconds time = Seconds.secondsBetween(dateLast, date);
+					
 
-					System.out.println(d);
+					System.out.println(d + "   " + date + "   " + dateLast + "   " + time.getSeconds() + "   VEL: " + (d/(time.getSeconds() / 3600.0)));
 					lastPosition = p;
 				}
 			}

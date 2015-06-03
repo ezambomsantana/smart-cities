@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="monitor">
+        <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
+        <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
+        <dependent-module archiveName="geocodind-0.0.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/geocodind/geocodind">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="twitter-0.0.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/twitter/twitter">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="sptrans-0.0.1.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/sptrans/sptrans">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="context-root" value="monitor"/>
+        <property name="java-output-path" value="/monitor/target/classes"/>
+    </wb-module>
+</project-modules>

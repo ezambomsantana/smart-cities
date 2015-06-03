@@ -6,10 +6,13 @@ import com.santana.sc.geocoding.Geocode;
 import com.santana.sc.sptrans.Bus;
 import com.santana.sc.sptrans.Crawler;
 
+import twitter4j.Query;
+import twitter4j.QueryResult;
 import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
+import twitter4j.api.TweetsResources;
 import twitter4j.conf.ConfigurationBuilder;
 
 public class Main {
@@ -26,7 +29,12 @@ public class Main {
 		TwitterFactory tf = new TwitterFactory(cb.build());
 		Twitter twitter = tf.getInstance();
 		
-		Crawler c = new Crawler();
+		Query query = new Query("são paulo");
+	    QueryResult result = twitter.search(query);
+	    for (Status status : result.getTweets()) {
+	        System.out.println("@" + status.getUser().getScreenName() + ":" + status.getText());
+	    }
+		/*Crawler c = new Crawler();
 		c.getToken();
 		List<Bus> buses = c.getLinhas();
 		
@@ -37,7 +45,7 @@ public class Main {
 			Status status = twitter.updateStatus("Onibus: " + b.getCode() + " Linha: " + b.getLetters() + " Local: " + address);
 			System.out.println("Successfully updated the status to [" + status.getText() + "].");
 
-		}
+		}*/
 		
 		
 	}

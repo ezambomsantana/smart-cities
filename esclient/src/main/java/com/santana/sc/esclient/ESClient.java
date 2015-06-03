@@ -19,7 +19,7 @@ import org.elasticsearch.search.aggregations.support.format.ValueFormatter.GeoHa
 
 public class ESClient {
 	
-	public void putData(int busCode, int lineCode, String name, String letters, String lat, String lon, Date date) {
+	public void putDataBus(int busCode, int lineCode, String name, String letters, String lat, String lon, Date date) {
 
 		
 		Client client = new TransportClient().addTransportAddress(new InetSocketTransportAddress("localhost", 9300));
@@ -38,7 +38,7 @@ public class ESClient {
 		data.put("letters", letters);
 		data.put("dateBus", date);
 
-		IndexResponse response = client.prepareIndex("sptrans2", "onibus")
+		IndexResponse response = client.prepareIndex("sptrans3", "onibus")
 		        .setSource(data)
 		        .execute()
 		        .actionGet();

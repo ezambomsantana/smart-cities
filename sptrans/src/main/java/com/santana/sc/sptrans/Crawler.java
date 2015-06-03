@@ -199,6 +199,7 @@ public class Crawler {
 				while (it.hasNext()) {
 					t++;
 					System.out.println("busao: " + t);
+					System.out.println(jsonObject);
 					jsonObject = (JSONObject) it.next();
 					Double py = (Double) jsonObject.get("py");
 					Double px = (Double) jsonObject.get("px");
@@ -207,7 +208,7 @@ public class Crawler {
 							: denominacaoTSTP;
 					
 					Bus bus = new Bus();
-					bus.setCode(codigo.intValue());
+					bus.setCode((Integer.parseInt((String) jsonObject.get("p"))));
 					bus.setLat(py);
 					bus.setLon(px);
 					bus.setName(denomicao);
@@ -215,7 +216,7 @@ public class Crawler {
 					
 					buses.add(bus);
 
-					System.out.println("\"Codigo: " + codigo
+					System.out.println("\"Codigo: " + bus.getCode()
 							+ "\" Letreiro: \"" + letreiro + "\" Denominacao: "
 							+ denomicao + " Hora: " + hr + " lat: " + py
 							+ "long: " + px);
